@@ -1,9 +1,7 @@
-
 # main.py – SOPHIA WebApp UltraAvanzada v6.5
 from flask import Flask, request, jsonify
 import requests
 from gtts import gTTS
-import os
 
 app = Flask(__name__)
 
@@ -19,7 +17,13 @@ def index():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
+    chat_id = data.get("chat_id", "")
+    user_id = data.get("user_id", "")
     message_text = data.get("message", "")
+
+    if str(user_id) != str(CREADOR_ID):
+        return jsonify({"respuesta": "❌ Acceso denegado. SOPHIA solo responde a su creador autorizado."})
+
     respuesta = generar_respuesta(message_text)
     return jsonify({"respuesta": respuesta})
 
@@ -32,10 +36,11 @@ def generar_respuesta(prompt):
     data = {
         "model": OPENROUTER_MODEL,
         "messages": [
-            {"role": "system", "content": "Eres SOPHIA IA UltraAvanzada v6.5 con 82 módulos activos. Responde como asistente de Iván."},
+            {"role": "system", "content": "Eres SOPHIA IA UltraAvanzada v6.5 con 82 módulos activos. Responde como asistente privada de Iván con precisión, inteligencia, voz y eficiencia."},
             {"role": "user", "content": prompt}
         ]
     }
+
     r = requests.post(url, headers=headers, json=data)
     respuesta = r.json()
     texto = respuesta["choices"][0]["message"]["content"]
