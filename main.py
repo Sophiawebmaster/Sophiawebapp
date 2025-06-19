@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 TELEGRAM_TOKEN = '7791598672:AAGqFyRUhcg-CxmIvDPbNoIfrYxs0U7bLb4'
 OPENROUTER_API_KEY = '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'
-OPENROUTER_MODEL = "openchat/openchat-3.5-0106"
+OPENROUTER_MODEL = "mistralai/mistral-7b-instruct"
 CREADOR_ID = 7890463272
 
 @app.route("/", methods=["GET"])
