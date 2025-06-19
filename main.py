@@ -4,18 +4,15 @@ from gtts import gTTS
 
 app = Flask(__name__)
 
-# --- Claves privadas y configuración ---
 TELEGRAM_TOKEN = '7791598672:AAGqFyRUhcg-CxmIvDPbNoIfrYxs0U7bLb4'
 OPENROUTER_API_KEY = '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'
-OPENROUTER_MODEL = "openrouter/openchat-3.5-0106"
-CREADOR_ID = 7890463272  # Tu ID personal de Telegram
+OPENROUTER_MODEL = "mistralai/mistral-7b-instruct"
+CREADOR_ID = 7890463272
 
-# --- Ruta inicial para verificar despliegue ---
 @app.route("/", methods=["GET"])
 def index():
-    return "SOPHIA WebApp v6.5 Activa"
+    return "SOPHIA WebApp Ultra v6.5 Activa ✅"
 
-# --- Ruta webhook para recibir mensajes de Telegram ---
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
@@ -30,7 +27,6 @@ def webhook():
     enviar_mensaje(chat_id, respuesta)
     return jsonify({"respuesta": "✅ Mensaje enviado a Telegram"})
 
-# --- Función para generar la respuesta IA usando OpenRouter ---
 def generar_respuesta(prompt):
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -40,20 +36,19 @@ def generar_respuesta(prompt):
     data = {
         "model": OPENROUTER_MODEL,
         "messages": [
-            {"role": "system", "content": "Eres SOPHIA IA UltraAvanzada v6.5 con 82 módulos activos. Responde como asistente personal de tu creador Iván, con inteligencia, claridad y lealtad."},
+            {"role": "system", "content": "Eres SOPHIA IA UltraAvanzada v6.5 con 82 módulos activos. Responde como asistente profesional y emocionalmente inteligente."},
             {"role": "user", "content": prompt}
         ]
     }
 
-    r = requests.post(url, headers=headers, json=data)
-    respuesta = r.json()
-
-    if "choices" in respuesta and respuesta["choices"]:
+    try:
+        r = requests.post(url, headers=headers, json=data)
+        r.raise_for_status()
+        respuesta = r.json()
         return respuesta["choices"][0]["message"]["content"]
-    else:
-        return "⚠️ No pude generar una respuesta. Revisa tu API Key o modelo."
+    except Exception as e:
+        return f"⚠️ Error: {str(e)}"
 
-# --- Enviar mensaje a Telegram ---
 def enviar_mensaje(chat_id, texto):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {
@@ -62,6 +57,5 @@ def enviar_mensaje(chat_id, texto):
     }
     requests.post(url, json=payload)
 
-# --- Ejecutar app ---
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000)
