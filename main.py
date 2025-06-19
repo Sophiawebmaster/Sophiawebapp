@@ -5,8 +5,8 @@ from gtts import gTTS
 app = Flask(__name__)
 
 TELEGRAM_TOKEN = '7791598672:AAGqFyRUhcg-CxmIvDPbNoIfrYxs0U7bLb4'
-OPENROUTER_API_KEY = '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'
-OPENROUTER_MODEL = 'mistralai/mistral-7b-instruct'
+OPENROUTER_API_KEY = "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"
+OPENROUTER_MODEL = "mistralai/mistral-7b-instruct"
 CREADOR_ID = 7890463272
 
 @app.route("/", methods=["GET"])
