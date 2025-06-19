@@ -1,4 +1,4 @@
-# main.py - SOPHIA WebApp UltraAvanzada v6.5
+# main.py – SOPHIA WebApp UltraAvanzada v6.5
 from flask import Flask, request, jsonify
 import requests
 from gtts import gTTS
@@ -17,17 +17,17 @@ def index():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
-    chat_id = data.get("chat_id", "")
-    user_id = data.get("user_id", "")
-    message_text = data.get("message", "")
+    chat_id = data.get("message", {}).get("chat", {}).get("id", "")
+    user_id = data.get("message", {}).get("from", {}).get("id", "")
+    message_text = data.get("message", {}).get("text", "")
 
     if str(user_id) != str(CREADOR_ID):
-        enviar_telegram(chat_id, "❌ Acceso denegado. SOPHIA solo responde a su creador autorizado.")
-        return jsonify({"respuesta": "❌ Acceso denegado"})
+        enviar_mensaje(chat_id, "❌ Acceso denegado. SOPHIA solo responde a su creador autorizado.")
+        return jsonify({"respuesta": "Acceso denegado"})
 
     respuesta = generar_respuesta(message_text)
-    enviar_telegram(chat_id, respuesta)
-    return jsonify({"respuesta": "✅ Mensaje enviado a Telegram"})
+    enviar_mensaje(chat_id, respuesta)
+    return jsonify({"respuesta": respuesta})
 
 def generar_respuesta(prompt):
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -47,7 +47,7 @@ def generar_respuesta(prompt):
     texto = respuesta["choices"][0]["message"]["content"]
     return texto
 
-def enviar_telegram(chat_id, texto):
+def enviar_mensaje(chat_id, texto):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {
         "chat_id": chat_id,
