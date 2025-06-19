@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 from gtts import gTTS
+import os
 
 app = Flask(__name__)
 
@@ -11,7 +12,7 @@ CREADOR_ID = 7890463272
 
 @app.route("/", methods=["GET"])
 def index():
-    return "SOPHIA WebApp Ultra v6.5 Activa ✅"
+    return "SOPHIA WebApp v6.5 Activa"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -25,7 +26,9 @@ def webhook():
 
     respuesta = generar_respuesta(message_text)
     enviar_mensaje(chat_id, respuesta)
-    return jsonify({"respuesta": "✅ Mensaje enviado a Telegram"})
+    generar_audio(chat_id, respuesta)
+    
+    return jsonify({"respuesta": "✅ Mensaje enviado a Telegram con voz"})
 
 def generar_respuesta(prompt):
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -36,18 +39,17 @@ def generar_respuesta(prompt):
     data = {
         "model": OPENROUTER_MODEL,
         "messages": [
-            {"role": "system", "content": "Eres SOPHIA IA UltraAvanzada v6.5 con 82 módulos activos. Responde como asistente profesional y emocionalmente inteligente."},
+            {"role": "system", "content": "Eres SOPHIA IA UltraAvanzada v6.5 con 82 módulos activos. Responde como asistente experta, leal y brillante."},
             {"role": "user", "content": prompt}
         ]
     }
-
     try:
         r = requests.post(url, headers=headers, json=data)
         r.raise_for_status()
         respuesta = r.json()
         return respuesta["choices"][0]["message"]["content"]
     except Exception as e:
-        return f"⚠️ Error: {str(e)}"
+        return "⚠️ No pude generar una respuesta. Revisa tu API Key, modelo o conexión."
 
 def enviar_mensaje(chat_id, texto):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
@@ -56,6 +58,17 @@ def enviar_mensaje(chat_id, texto):
         "text": texto
     }
     requests.post(url, json=payload)
+
+def generar_audio(chat_id, texto):
+    tts = gTTS(text=texto, lang='es')
+    filename = f"{chat_id}.mp3"
+    tts.save(filename)
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendVoice"
+    with open(filename, 'rb') as voice:
+        requests.post(url, data={"chat_id": chat_id}, files={"voice": voice})
+    
+    os.remove(filename)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000)
