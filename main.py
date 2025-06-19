@@ -1,7 +1,10 @@
-# main.py – SOPHIA WebApp UltraAvanzada v6.5
+
+# main.py – SOPHIA WebApp UltraAvanzada v6.5 final
+
 from flask import Flask, request, jsonify
 import requests
 from gtts import gTTS
+import os
 
 app = Flask(__name__)
 
@@ -27,7 +30,7 @@ def webhook():
 
     respuesta = generar_respuesta(message_text)
     enviar_mensaje(chat_id, respuesta)
-    return jsonify({"respuesta": respuesta})
+    return jsonify({"respuesta": "Mensaje enviado a Telegram"})
 
 def generar_respuesta(prompt):
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -42,6 +45,7 @@ def generar_respuesta(prompt):
             {"role": "user", "content": prompt}
         ]
     }
+
     r = requests.post(url, headers=headers, json=data)
     respuesta = r.json()
     texto = respuesta["choices"][0]["message"]["content"]
