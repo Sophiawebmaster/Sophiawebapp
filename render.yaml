@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: sophiawebapp
+    env: python
+    buildCommand: ""
+    startCommand: "python main.py"
+    plan: free
+    region: oregon
+    branch: main
